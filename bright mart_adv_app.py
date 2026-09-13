@@ -2,274 +2,168 @@ import streamlit as st
 import joblib
 import numpy as np
 
-# ============================================================
-# PAGE CONFIGURATION
-# ============================================================
-
+# ---------------------------------------------------------
+# PAGE CONFIG
+# ---------------------------------------------------------
 st.set_page_config(
-    page_title="AVENGERS | Sales Intelligence",
+    page_title="Avengers Sales Intelligence",
     page_icon="🛡️",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 
-# ============================================================
-# CAPTAIN AMERICA / AVENGERS CSS
-# ============================================================
-
+# ---------------------------------------------------------
+# CAPTAIN AMERICA THEME
+# ---------------------------------------------------------
 st.markdown("""
 <style>
-
-    /* ---------- GLOBAL ---------- */
     .stApp {
-        background:
-            radial-gradient(circle at 50% 10%, rgba(30, 70, 130, 0.35), transparent 35%),
-            linear-gradient(135deg, #020617 0%, #07152e 45%, #020617 100%);
-        color: #f8fafc;
-        font-family: 'Arial', sans-serif;
+        background: linear-gradient(135deg, #020617, #071a3d, #020617);
+        color: white;
     }
 
-    /* Hide Streamlit branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-
-    /* ---------- HERO HEADER ---------- */
-
-    .hero {
+    /* Main title */
+    .main-title {
         text-align: center;
-        padding: 35px 20px 25px 20px;
-        margin-bottom: 25px;
-    }
-
-    .shield {
-        font-size: 72px;
-        margin-bottom: 5px;
-        filter: drop-shadow(0px 0px 18px rgba(37, 99, 235, 0.7));
-    }
-
-    .avengers-title {
-        font-size: 48px;
+        font-size: 46px;
         font-weight: 900;
         letter-spacing: 5px;
-        color: #ffffff;
-        text-shadow:
-            0px 0px 10px rgba(59, 130, 246, 0.8),
-            0px 0px 25px rgba(220, 38, 38, 0.4);
-        margin: 0;
+        color: white;
+        margin-bottom: 0px;
+        text-shadow: 0px 0px 15px #2563eb;
     }
 
-    .subtitle {
-        color: #94a3b8;
-        font-size: 16px;
+    .sub-title {
+        text-align: center;
+        color: #93c5fd;
+        font-size: 15px;
         letter-spacing: 3px;
-        margin-top: 8px;
-        text-transform: uppercase;
+        margin-bottom: 30px;
     }
 
-    .mission {
-        display: inline-block;
-        margin-top: 18px;
-        padding: 7px 18px;
-        border-radius: 20px;
-        border: 1px solid #dc2626;
-        color: #fca5a5;
-        background: rgba(127, 29, 29, 0.25);
-        font-size: 12px;
-        letter-spacing: 2px;
-        font-weight: bold;
-    }
-
-    /* ---------- CARDS ---------- */
-
-    .section-card {
-        background: rgba(15, 23, 42, 0.82);
-        border: 1px solid rgba(59, 130, 246, 0.45);
-        border-radius: 18px;
+    /* Cards */
+    .card {
+        background: rgba(15, 23, 42, 0.9);
         padding: 25px;
-        box-shadow:
-            0 8px 30px rgba(0, 0, 0, 0.35),
-            inset 0 0 20px rgba(30, 64, 175, 0.08);
-        margin-bottom: 20px;
+        border-radius: 18px;
+        border: 1px solid #2563eb;
+        box-shadow: 0px 0px 20px rgba(37, 99, 235, 0.2);
     }
 
-    .section-title {
+    .card-title {
+        color: #60a5fa;
         font-size: 20px;
         font-weight: 800;
-        color: #e2e8f0;
-        letter-spacing: 1px;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
     }
 
-    .section-description {
-        color: #64748b;
-        font-size: 13px;
-        margin-bottom: 20px;
+    .card-text {
+        color: #94a3b8;
+        font-size: 14px;
     }
 
-    /* ---------- INPUT LABELS ---------- */
-
-    label {
-        color: #cbd5e1 !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.5px;
-    }
-
-    /* ---------- NUMBER INPUT ---------- */
-
-    div[data-testid="stNumberInput"] input {
-        background: rgba(2, 6, 23, 0.9) !important;
-        color: #f8fafc !important;
-        border: 1px solid #334155 !important;
-        border-radius: 10px !important;
-        padding: 12px !important;
-    }
-
-    div[data-testid="stNumberInput"] input:focus {
-        border: 1px solid #3b82f6 !important;
-        box-shadow: 0 0 12px rgba(59, 130, 246, 0.35) !important;
-    }
-
-    /* ---------- PREDICT BUTTON ---------- */
-
-    div.stButton > button {
+    /* Button */
+    .stButton > button {
         width: 100%;
-        height: 55px;
-        border-radius: 12px;
-        border: 2px solid #dc2626;
-        background:
-            linear-gradient(135deg, #b91c1c, #dc2626);
+        background: #b91c1c;
         color: white;
+        border: 2px solid #ef4444;
+        border-radius: 12px;
+        height: 55px;
         font-size: 17px;
-        font-weight: 900;
-        letter-spacing: 2px;
-        transition: all 0.25s ease;
-        box-shadow:
-            0 0 15px rgba(220, 38, 38, 0.25);
+        font-weight: 800;
+        letter-spacing: 1px;
     }
 
-    div.stButton > button:hover {
-        transform: translateY(-2px);
+    .stButton > button:hover {
+        background: #dc2626;
         border-color: #60a5fa;
-        background: linear-gradient(135deg, #dc2626, #991b1b);
-        box-shadow:
-            0 0 25px rgba(220, 38, 38, 0.5);
+        box-shadow: 0px 0px 20px rgba(220, 38, 38, 0.5);
     }
 
-    /* ---------- RESULT ---------- */
+    /* Input boxes */
+    div[data-testid="stNumberInput"] input {
+        background-color: #020617;
+        color: white;
+        border: 1px solid #334155;
+        border-radius: 10px;
+    }
 
-    .result-card {
+    /* Prediction */
+    .prediction {
         text-align: center;
-        padding: 30px;
-        margin-top: 25px;
-        border-radius: 18px;
+        background: linear-gradient(
+            135deg,
+            rgba(30, 64, 175, 0.4),
+            rgba(127, 29, 29, 0.4)
+        );
         border: 2px solid #3b82f6;
-        background:
-            radial-gradient(circle at center,
-                rgba(37, 99, 235, 0.25),
-                rgba(15, 23, 42, 0.9));
-        box-shadow:
-            0 0 30px rgba(37, 99, 235, 0.25);
+        border-radius: 18px;
+        padding: 25px;
+        margin-top: 25px;
     }
 
-    .result-label {
+    .prediction-title {
         color: #93c5fd;
-        font-size: 13px;
-        letter-spacing: 3px;
-        font-weight: bold;
+        font-size: 14px;
+        letter-spacing: 2px;
     }
 
-    .result-number {
+    .prediction-value {
+        color: white;
         font-size: 48px;
         font-weight: 900;
-        color: #ffffff;
-        margin: 8px 0;
-        text-shadow: 0 0 15px rgba(96, 165, 250, 0.7);
+        text-shadow: 0px 0px 15px #3b82f6;
     }
-
-    .result-status {
-        color: #86efac;
-        font-size: 13px;
-        letter-spacing: 1px;
-    }
-
-    /* ---------- FOOTER ---------- */
 
     .footer {
         text-align: center;
-        margin-top: 35px;
-        padding: 15px;
         color: #475569;
         font-size: 11px;
         letter-spacing: 2px;
+        margin-top: 35px;
     }
-
-    .footer span {
-        color: #dc2626;
-    }
-
 </style>
 """, unsafe_allow_html=True)
 
-
-# ============================================================
+# ---------------------------------------------------------
 # LOAD MODEL
-# ============================================================
+# ---------------------------------------------------------
+model = joblib.load(open("linear_reg.sav", "rb"))
 
-model = joblib.load(open('linear_reg.sav', 'rb'))
+# ---------------------------------------------------------
+# HEADER
+# ---------------------------------------------------------
+st.markdown(
+    '<div class="main-title">🛡️ AVENGERS</div>',
+    unsafe_allow_html=True
+)
 
+st.markdown(
+    '<div class="sub-title">SALES INTELLIGENCE COMMAND CENTER</div>',
+    unsafe_allow_html=True
+)
 
-# ============================================================
-# HERO SECTION
-# ============================================================
+# ---------------------------------------------------------
+# LAYOUT
+# ---------------------------------------------------------
+left, right = st.columns([1.7, 1])
 
-st.markdown("""
-<div class="hero">
-
-    <div class="shield">🛡️</div>
-
-    <div class="avengers-title">
-        AVENGERS
-    </div>
-
-    <div class="subtitle">
-        Sales Intelligence Command Center
-    </div>
-
-    <div class="mission">
-        ◉ MISSION STATUS : ACTIVE
-    </div>
-
-</div>
-""", unsafe_allow_html=True)
-
-
-# ============================================================
-# MAIN LAYOUT
-# ============================================================
-
-left, right = st.columns([1.8, 1], gap="large")
-
-
-# ============================================================
-# INPUT PANEL
-# ============================================================
-
+# ---------------------------------------------------------
+# INPUT SECTION
+# ---------------------------------------------------------
 with left:
 
-    st.markdown("""
-    <div class="section-card">
+    st.markdown(
+        '<div class="card">'
+        '<div class="card-title">⚡ MISSION PARAMETERS</div>'
+        '<div class="card-text">'
+        'Configure the advertising budget to generate the sales forecast.'
+        '</div>'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
-        <div class="section-title">
-            ⚡ MISSION PARAMETERS
-        </div>
-
-        <div class="section-description">
-            Configure advertising resources to deploy the Sales Prediction Protocol.
-        </div>
-
-    </div>
-    """, unsafe_allow_html=True)
+    st.write("")
 
     TV = st.number_input(
         "📺 TV Advertising Budget",
@@ -292,106 +186,63 @@ with left:
         step=1.0
     )
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.write("")
 
-    predict = st.button("🛡️  INITIATE SALES PREDICTION")
+    predict = st.button("🛡️ INITIATE SALES PREDICTION")
 
-
-# ============================================================
-# AVENGERS STATUS PANEL
-# ============================================================
-
+# ---------------------------------------------------------
+# AVENGERS PANEL
+# ---------------------------------------------------------
 with right:
 
-    st.markdown("""
-    <div class="section-card">
+    st.markdown(
+        '<div class="card">'
+        '<div class="card-title">⭐ AVENGERS PROTOCOL</div>'
+        '<div class="card-text">'
+        '<br>'
+        '🛡️ <b>CAPTAIN AMERICA</b><br>'
+        '<span style="color:#64748b;">Strategy & Coordination</span>'
+        '<br><br>'
+        '🤖 <b>JARVIS</b><br>'
+        '<span style="color:#64748b;">Predictive Intelligence</span>'
+        '<br><br>'
+        '🔴 <b>MISSION STATUS</b><br>'
+        '<span style="color:#4ade80;">● SYSTEM ONLINE</span>'
+        '</div>'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
-        <div class="section-title">
-            ⭐ AVENGERS PROTOCOL
-        </div>
-
-        <div class="section-description">
-            Predictive intelligence system online.
-        </div>
-
-        <p style="color:#94a3b8; font-size:13px;">
-            The model analyses your advertising allocation
-            across three channels and estimates the expected
-            sales outcome.
-        </p>
-
-        <br>
-
-        <div style="
-            border-left:3px solid #dc2626;
-            padding-left:15px;
-            margin-bottom:15px;
-        ">
-            <div style="color:#f87171;font-weight:bold;">
-                CAPTAIN AMERICA
-            </div>
-            <div style="color:#64748b;font-size:12px;">
-                Strategy & Coordination
-            </div>
-        </div>
-
-        <div style="
-            border-left:3px solid #3b82f6;
-            padding-left:15px;
-        ">
-            <div style="color:#60a5fa;font-weight:bold;">
-                JARVIS
-            </div>
-            <div style="color:#64748b;font-size:12px;">
-                Predictive Intelligence
-            </div>
-        </div>
-
-    </div>
-    """, unsafe_allow_html=True)
-
-
-# ============================================================
+# ---------------------------------------------------------
 # PREDICTION
-# ============================================================
-
+# ---------------------------------------------------------
 if predict:
 
-    input_data = np.array([
-        [TV, Radio, Newspaper]
-    ])
+    input_data = np.array([[TV, Radio, Newspaper]])
 
     prediction = model.predict(input_data)[0]
 
-    st.markdown(f"""
-    <div class="result-card">
+    st.markdown(
+        f'<div class="prediction">'
+        f'<div class="prediction-title">'
+        f'🛡️ SALES PREDICTION COMPLETE'
+        f'</div>'
+        f'<div class="prediction-value">'
+        f'{prediction:.2f}'
+        f'</div>'
+        f'<div style="color:#4ade80;">'
+        f'✓ FORECAST GENERATED SUCCESSFULLY'
+        f'</div>'
+        f'</div>',
+        unsafe_allow_html=True
+    )
 
-        <div class="result-label">
-            🛡️ PREDICTION PROTOCOL COMPLETE
-        </div>
-
-        <div class="result-number">
-            {prediction:.2f}
-        </div>
-
-        <div class="result-status">
-            ✓ SALES FORECAST SUCCESSFULLY GENERATED
-        </div>
-
-    </div>
-    """, unsafe_allow_html=True)
-
-
-# ============================================================
+# ---------------------------------------------------------
 # FOOTER
-# ============================================================
-
-st.markdown("""
-<div class="footer">
-    AVENGERS SALES INTELLIGENCE SYSTEM
-    <span> • </span>
-    POWERED BY MACHINE LEARNING
-    <span> • </span>
-    MARVEL-INSPIRED INTERFACE
-</div>
-""", unsafe_allow_html=True)
+# ---------------------------------------------------------
+st.markdown(
+    '<div class="footer">'
+    'AVENGERS SALES INTELLIGENCE • MACHINE LEARNING SYSTEM'
+    '</div>',
+    unsafe_allow_html=True
+)
