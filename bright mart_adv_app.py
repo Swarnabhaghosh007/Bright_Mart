@@ -7,20 +7,20 @@ import numpy as np
 # ---------------------------------------------------------
 
 st.set_page_config(
-    page_title="Blueberry Analytics",
+    page_title="Violet Blueberry Analytics",
     page_icon="🫐",
     layout="wide"
 )
 
 # ---------------------------------------------------------
-# BLUEBERRY THEME
+# HEADER
 # ---------------------------------------------------------
 
-st.title("🫐 Blueberry Analytics")
+st.title("🫐 Violet Blueberry Analytics")
 st.subheader("✨ Sales Prediction Studio")
 
 st.write(
-    "A simple machine learning dashboard for predicting sales "
+    "A machine learning dashboard for predicting sales "
     "based on advertising expenditure."
 )
 
@@ -39,7 +39,7 @@ model = joblib.load(open("linear_reg.sav", "rb"))
 left, right = st.columns([2, 1])
 
 # ---------------------------------------------------------
-# LEFT PANEL — INPUTS
+# INPUT SECTION
 # ---------------------------------------------------------
 
 with left:
@@ -80,27 +80,27 @@ with left:
     )
 
 # ---------------------------------------------------------
-# RIGHT PANEL — INFORMATION
+# MODEL STATUS
 # ---------------------------------------------------------
 
 with right:
 
-    st.header("🔵 Model Intelligence")
+    st.header("🟣 Model Intelligence")
 
-    st.success("🟢 Model Online")
+    st.success("🟢 MODEL ONLINE")
 
     st.metric(
-        "📺 TV",
+        "📺 TV Budget",
         f"{TV:.0f}"
     )
 
     st.metric(
-        "🎧 Radio",
+        "🎧 Radio Budget",
         f"{Radio:.0f}"
     )
 
     st.metric(
-        "📰 Newspaper",
+        "📰 Newspaper Budget",
         f"{Newspaper:.0f}"
     )
 
@@ -123,7 +123,7 @@ if predict:
 
     st.divider()
 
-    st.header("🫐 Prediction Result")
+    st.header("🟣 Prediction Result")
 
     col1, col2, col3 = st.columns([1, 2, 1])
 
@@ -148,5 +148,6 @@ if predict:
 st.divider()
 
 st.caption(
-    "🫐 Blueberry Analytics • Machine Learning Sales Predictor"
+    "🫐 Violet Blueberry Analytics • "
+    "Machine Learning Sales Predictor"
 )
